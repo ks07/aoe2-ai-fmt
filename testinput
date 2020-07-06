@@ -1,0 +1,8 @@
+(defrule
+    (player-in-game 1)
+    (player-human 1)
+    (goal 1 1)
+    =>
+    (chat-to-player 1 "3 Train villagers, build 2 houses, and send 6 to sheep [7 pop](6 sheep)")
+    (set-goal 1 2)
+)
