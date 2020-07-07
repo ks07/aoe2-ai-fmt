@@ -1,0 +1,8 @@
+# Generated ANTLR4 output
+*.java
+*.class
+*.interp
+*.tokens
+PERLexer.py
+PERParser.py
+PERListener.py
