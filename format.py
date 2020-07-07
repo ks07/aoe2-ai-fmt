@@ -4,8 +4,7 @@ import sys
 
 from antlr4 import *
 
-from PERLexer import PERLexer
-from PERParser import PERParser
+from perparse import PERLexer, PERParser
 from FormattedPERListener import FormattedPERListener
 
 def main(argv):

@@ -6,3 +6,6 @@
 PERLexer.py
 PERParser.py
 PERListener.py
+
+# Temp build directory
+build/

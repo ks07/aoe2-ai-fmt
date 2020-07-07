@@ -1,9 +1,12 @@
 .PHONY: test clean
 
 INPUTDIR = examples
+BUILDDIR = build
+PKGDIR   = perparse
 
-PERParser.py PERLexer.py PERListener.py : PER.g4
-	antlr4 -Dlanguage=Python3 PER.g4
+$(PKGDIR)/PERParser.py $(PKGDIR)/PERLexer.py $(PKGDIR)/PERListener.py : PER.g4
+	antlr4 -Dlanguage=Python3 -o $(BUILDDIR) PER.g4
+	mv $(BUILDDIR)/*.py $(PKGDIR)/
 
 test : export CLASSPATH = /usr/share/java/stringtemplate4.jar:/usr/share/java/antlr4.jar:/usr/share/java/antlr4-runtime.jar:/usr/share/java/antlr3-runtime.jar/:/usr/share/java/treelayout.jar
 test : $(INPUTDIR)/*

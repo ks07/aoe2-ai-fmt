@@ -2,8 +2,7 @@ import sys
 
 from antlr4 import *
 
-from PERParser import PERParser
-from PERListener import PERListener
+from perparse import PERParser, PERListener
 
 class FormattedPERListener(PERListener):
     "An ANTLR4 listener for AoE2 .per AI files that writes formatted rules to an output stream"
