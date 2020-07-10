@@ -1,0 +1,11 @@
+; Set the initial goal for house reminders
+
+; the next line is a comment with no content
+;
+(defrule
+    (player-in-game 1) ;
+    (player-human 1)
+    =>
+    (set-goal 1 1)
+    (disable-self) ; don't run this more than once
+)

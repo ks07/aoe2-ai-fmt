@@ -4,16 +4,17 @@ grammar PER;
  * Parser
  */
 
-per                 : (statement | comment | WHITESPACE)+ EOF ;
+per                 : (statement | comment | WHITESPACE | whitespace_comment)+ EOF ;
 statement           : OPEN command CLOSE ;
 comment             : COMMENT ;
 command             : ( defrule | defconst ) ;
-defrule             : DEFRULE WHITESPACE+ proposition_list DEFRULE_SEPARATOR WHITESPACE* action_list ;
-proposition_list    : ( proposition WHITESPACE+ )+ ;
-proposition         : OPEN SYMBOL ( WHITESPACE (REL_OP | SYMBOL | SHORT) )* WHITESPACE? CLOSE ;
-action_list         : ( action WHITESPACE+ )+ ;
-action              : OPEN SYMBOL ( WHITESPACE (SYMBOL | SHORT | STRING) )* WHITESPACE? CLOSE ;
-defconst            : DEFCONST WHITESPACE+ SYMBOL WHITESPACE+ SHORT ;
+defrule             : DEFRULE whitespace_comment+ proposition_list DEFRULE_SEPARATOR whitespace_comment* action_list ;
+proposition_list    : ( proposition whitespace_comment+ )+ ;
+proposition         : OPEN SYMBOL ( whitespace_comment (REL_OP | SYMBOL | SHORT) )* whitespace_comment? CLOSE ;
+action_list         : ( action whitespace_comment+ )+ ;
+action              : OPEN SYMBOL ( whitespace_comment (SYMBOL | SHORT | STRING) )* whitespace_comment? CLOSE ;
+defconst            : DEFCONST whitespace_comment+ SYMBOL whitespace_comment+ SHORT ;
+whitespace_comment  : ( WHITESPACE+ COMMENT? WHITESPACE* ) ; // Allows comments to appear within this whitespace, COMMENT enforces a newline
 
 /*
  * Lexer
