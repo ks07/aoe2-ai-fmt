@@ -4,9 +4,9 @@ grammar PER;
  * Parser
  */
 
-per                 : (statement | comment | WHITESPACE | whitespace_comment)+ EOF ;
+per                 : (statement | lone_comment | WHITESPACE | whitespace_comment)+ EOF ;
 statement           : OPEN command CLOSE ;
-comment             : COMMENT ;
+lone_comment        : COMMENT ;
 command             : ( defrule | defconst ) ;
 defrule             : DEFRULE whitespace_comment+ proposition_list DEFRULE_SEPARATOR whitespace_comment* action_list ;
 proposition_list    : ( proposition whitespace_comment+ )+ ;

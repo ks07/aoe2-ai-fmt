@@ -3,6 +3,7 @@ import sys
 from antlr4 import *
 
 from perparse import PERParser, PERListener
+from CommentSpooler import CommentSpooler
 
 class FormattedPERListener(PERListener):
     "An ANTLR4 listener for AoE2 .per AI files that writes formatted rules to an output stream"
@@ -12,8 +13,18 @@ class FormattedPERListener(PERListener):
         self.__indentLevel = 0
         self.__indent = indent
         self.__begun = False
+        self.__commentSpooler = CommentSpooler()
+        self.__withinStatement = False
+
+    def __write_inline_comments(self):
+        if self.__commentSpooler.hasComments():
+            self.__write(self.__commentSpooler.getInlineComments())
+            return True
 
     def __line(self, s):
+        if self.__write_inline_comments():
+            self.__begun = True
+
         if self.__begun:
             self.__write('\n')
         pfix = self.__indent * self.__indentLevel
@@ -34,6 +45,21 @@ class FormattedPERListener(PERListener):
     def exitPer(self, ctx:PERParser.PerContext):
         assert self.__indentLevel == 0
         self.__line('')
+
+    def enterStatement(self, ctx:PERParser.StatementContext):
+        self.__withinStatement = True
+
+    def exitStatement(self, ctx:PERParser.StatementContext):
+        self.__withinStatement = False
+        self.__line('')
+        self.__line('')
+
+    def enterLone_comment(self, ctx:PERParser.Lone_commentContext):
+        self.__line(ctx.COMMENT().getText())
+
+    def enterWhitespace_comment(self, ctx:PERParser.Whitespace_commentContext):
+        # Because the formatter will remove newlines, comments must be spooled up to display at line end
+        self.__commentSpooler.spool(ctx.COMMENT())
 
     def enterDefrule(self, ctx:PERParser.DefruleContext):
         entertxt = '(' + ctx.DEFRULE().getText()
