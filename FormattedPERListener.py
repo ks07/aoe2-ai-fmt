@@ -46,6 +46,7 @@ class FormattedPERListener(PERListener):
         # Balanced nesting should be enforced on the input by the ANTLR grammar
         # If the nesting is unbalanced once we're done with the parse tree, then that's a formatter bug
         assert self.__indentLevel == 0
+        self.__line('')
 
     def exitStatement(self, ctx:PERParser.StatementContext):
         # When we leave a statement, the proposition mode stack should be empty
@@ -57,7 +58,7 @@ class FormattedPERListener(PERListener):
             self.__line(ctx.CLOSE().getText())
 
     def enterLone_comment(self, ctx:PERParser.Lone_commentContext):
-        self.__line(ctx.COMMENT().getText())
+        self.__line(ctx.COMMENT().getText().strip())
 
     def enterWhitespace_comment(self, ctx:PERParser.Whitespace_commentContext):
         # Because the formatter will remove newlines, comments must be spooled up to display at line end
