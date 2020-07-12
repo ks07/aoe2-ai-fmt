@@ -50,7 +50,11 @@ class FormattedPERListener(PERListener):
     def exitStatement(self, ctx:PERParser.StatementContext):
         # When we leave a statement, the proposition mode stack should be empty
         assert not self.__explodedPropositionMode
-        self.__line('')
+        # if this statement was for a defconst command, then don't close on a new line
+        if ctx.command().defconst():
+            self.__write(ctx.CLOSE().getText())
+        else:
+            self.__line(ctx.CLOSE().getText())
 
     def enterLone_comment(self, ctx:PERParser.Lone_commentContext):
         self.__line(ctx.COMMENT().getText())
@@ -59,9 +63,18 @@ class FormattedPERListener(PERListener):
         # Because the formatter will remove newlines, comments must be spooled up to display at line end
         self.__commentSpooler.spool(ctx.COMMENT())
 
+    def enterStatement(self, ctx:PERParser.StatementContext):
+        self.__line(ctx.OPEN().getText())
+
+    def enterDefconst(self, ctx:PERParser.DefconstContext):
+        self.__write(ctx.DEFCONST().getText())
+        self.__write(' ')
+        self.__write(ctx.SYMBOL().getText())
+        self.__write(' ')
+        self.__write(ctx.SHORT().getText())
+
     def enterDefrule(self, ctx:PERParser.DefruleContext):
-        entertxt = '(' + ctx.DEFRULE().getText()
-        self.__line(entertxt)
+        self.__write(ctx.DEFRULE().getText())
         self.__enter()
 
     def enterProposition(self, ctx:PERParser.PropositionContext):
@@ -119,4 +132,3 @@ class FormattedPERListener(PERListener):
 
     def exitDefrule(self, ctx:PERParser.DefruleContext):
         self.__leave()
-        self.__line(')')
