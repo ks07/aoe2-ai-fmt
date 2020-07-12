@@ -91,12 +91,14 @@ class FormattedPERListener(PERListener):
             self.__explodedPropositionMode.append(False)
 
     def enterProposition_arg(self, ctx:PERParser.Proposition_argContext):
-        self.__write(' ')
         if ctx.SYMBOL():
+            self.__write(' ')
             self.__write(ctx.SYMBOL().getText())
         elif ctx.REL_OP():
+            self.__write(' ')
             self.__write(ctx.REL_OP().getText())
         elif ctx.SHORT():
+            self.__write(' ')
             self.__write(ctx.SHORT().getText())
         elif ctx.proposition():
             # Nested propositions will format and output themselves
