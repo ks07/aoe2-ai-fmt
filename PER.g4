@@ -10,9 +10,11 @@ lone_comment        : COMMENT ;
 command             : ( defrule | defconst ) ;
 defrule             : DEFRULE whitespace_comment+ proposition_list DEFRULE_SEPARATOR whitespace_comment* action_list ;
 proposition_list    : ( proposition whitespace_comment+ )+ ;
-proposition         : OPEN SYMBOL ( whitespace_comment (REL_OP | SYMBOL | SHORT) )* whitespace_comment? CLOSE ;
+proposition         : OPEN SYMBOL proposition_arg* whitespace_comment? CLOSE ;
+proposition_arg     : ( whitespace_comment (REL_OP | SYMBOL | SHORT | proposition) ) ;
 action_list         : ( action whitespace_comment+ )+ ;
-action              : OPEN SYMBOL ( whitespace_comment (SYMBOL | SHORT | STRING) )* whitespace_comment? CLOSE ;
+action              : OPEN SYMBOL action_arg* whitespace_comment? CLOSE ;
+action_arg          : ( whitespace_comment (SYMBOL | SHORT | STRING) ) ;
 defconst            : DEFCONST whitespace_comment+ SYMBOL whitespace_comment+ SHORT ;
 whitespace_comment  : ( WHITESPACE+ COMMENT? WHITESPACE* ) ; // Allows comments to appear within this whitespace, COMMENT enforces a newline
 

@@ -14,7 +14,7 @@ class FormattedPERListener(PERListener):
         self.__indent = indent
         self.__begun = False
         self.__commentSpooler = CommentSpooler()
-        self.__withinStatement = False
+        self.__explodedPropositionMode = []
 
     def __write_inline_comments(self):
         if self.__commentSpooler.hasComments():
@@ -43,15 +43,13 @@ class FormattedPERListener(PERListener):
         self.__indentLevel -= 1
 
     def exitPer(self, ctx:PERParser.PerContext):
+        # Balanced nesting should be enforced on the input by the ANTLR grammar
+        # If the nesting is unbalanced once we're done with the parse tree, then that's a formatter bug
         assert self.__indentLevel == 0
-        self.__line('')
-
-    def enterStatement(self, ctx:PERParser.StatementContext):
-        self.__withinStatement = True
 
     def exitStatement(self, ctx:PERParser.StatementContext):
-        self.__withinStatement = False
-        self.__line('')
+        # When we leave a statement, the proposition mode
+        assert not self.__explodedPropositionMode
         self.__line('')
 
     def enterLone_comment(self, ctx:PERParser.Lone_commentContext):
@@ -67,13 +65,57 @@ class FormattedPERListener(PERListener):
         self.__enter()
 
     def enterProposition(self, ctx:PERParser.PropositionContext):
-        self.__line(ctx.getText())
+        self.__line(ctx.OPEN().getText())
+        self.__write(ctx.SYMBOL().getText())
+        # If this proposition contains nested propositions, then we want to format it differently
+        # We need to check all the children in advance because we don't want a proposition with both types of args to mix both styles
+        args = ctx.proposition_arg()
+        if args and any((a.proposition() for a in args)):
+            self.__explodedPropositionMode.append(True)
+            self.__enter()
+        else:
+            self.__explodedPropositionMode.append(False)
+
+    def enterProposition_arg(self, ctx:PERParser.Proposition_argContext):
+        self.__write(' ')
+        if ctx.SYMBOL():
+            self.__write(ctx.SYMBOL().getText())
+        elif ctx.REL_OP():
+            self.__write(ctx.REL_OP().getText())
+        elif ctx.SHORT():
+            self.__write(ctx.SHORT().getText())
+        elif ctx.proposition():
+            # Nested propositions will format and output themselves
+            pass
+        else:
+            raise NotImplementedError(f'Proposition argument type is not supported in the formatter: [{ctx.getText().strip()}]')
+
+    def exitProposition(self, ctx:PERParser.PropositionContext):
+        if self.__explodedPropositionMode.pop():
+            self.__leave()
+            self.__line('')
+        self.__write(ctx.CLOSE().getText())
 
     def enterAction_list(self, ctx:PERParser.Action_listContext):
         self.__line('=>')
 
     def enterAction(self, ctx:PERParser.ActionContext):
-        self.__line(ctx.getText())
+        self.__line(ctx.OPEN().getText())
+        self.__write(ctx.SYMBOL().getText())
+
+    def enterAction_arg(self, ctx:PERParser.Action_argContext):
+        self.__write(' ')
+        if ctx.SYMBOL():
+            self.__write(ctx.SYMBOL().getText())
+        elif ctx.SHORT():
+            self.__write(ctx.SHORT().getText())
+        elif ctx.STRING():
+            self.__write(ctx.STRING().getText())
+        else:
+            raise NotImplementedError(f'Action argument type is not supported in the formatter: [{ctx.getText().strip()}]')
+
+    def exitAction(self, ctx:PERParser.ActionContext):
+        self.__write(ctx.CLOSE().getText())
 
     def exitDefrule(self, ctx:PERParser.DefruleContext):
         self.__leave()
