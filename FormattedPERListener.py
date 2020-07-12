@@ -48,7 +48,7 @@ class FormattedPERListener(PERListener):
         assert self.__indentLevel == 0
 
     def exitStatement(self, ctx:PERParser.StatementContext):
-        # When we leave a statement, the proposition mode
+        # When we leave a statement, the proposition mode stack should be empty
         assert not self.__explodedPropositionMode
         self.__line('')
 
