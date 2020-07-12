@@ -1,0 +1,31 @@
+; Set the initial goal for house reminders
+
+; the next line is a comment with no content
+;
+(defrule
+    (player-in-game 1) ;
+    (player-human 1)
+    =>
+    (set-goal 1 1)
+    (disable-self) ; don't run this more than once
+)
+
+; -------Set some goals-----
+
+(defrule
+    (true)         ; run this once straight away
+    =>
+    (set-goal 0 1)
+    (set-goal 1 1)
+    (set-goal 2 1)
+    (set-goal 3 1)
+    (set-goal 4 1)
+    (set-goal 5 1)
+    (set-goal 6 1)
+    (set-goal 7 1)
+    (set-goal 8 1)
+; this comment should be associated with the next line
+    (disable-self)
+)
+
+; comment at the end of file

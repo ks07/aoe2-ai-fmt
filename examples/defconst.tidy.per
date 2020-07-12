@@ -1,0 +1,9 @@
+(defconst target-knight-count 6)
+
+; try to always have at least target-knight-count knights
+(defrule
+    (unit-type-count knight < target-knight-count)
+    (can-train knight)
+    =>
+    (train knight)
+)
