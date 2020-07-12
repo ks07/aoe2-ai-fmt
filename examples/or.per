@@ -1,0 +1,25 @@
+; house reminders (to a point)
+(defrule
+    (player-in-game 1)
+    (player-human 1)
+    (goal 1 1)
+        (or
+            (players-population 1 == 63)
+            (or
+                (players-population 1 == 53)
+                (or
+                    (players-population 1 == 43)
+                    (or
+                        (players-population 1 == 33)
+                        (or
+                            (players-population 1 == 23)
+                            (players-population 1 == 13)
+                        )
+                    )
+                )
+            )
+        )
+    =>
+    (chat-to-player 1 "29 --BUILD A HOUSE!--")
+    (set-goal 1 0)
+)
