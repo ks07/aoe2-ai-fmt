@@ -4,7 +4,12 @@ grammar PER;
  * Parser
  */
 
-per                 : (statement | lone_comment | WHITESPACE)+ EOF ;
+per                 : toplevel_content EOF ;
+toplevel_content    : (statement | lone_comment | WHITESPACE | conditional_block)+ ;
+conditional_block   : conditional_cond conditional_content WHITESPACE+ conditional_else? CONDLOAD_END ;
+conditional_cond    : ( CONDLOAD_DEFINED | CONDLOAD_UNDEFINED ) whitespace_comment+ SYMBOL whitespace_comment* WHITESPACE ;
+conditional_content : toplevel_content ;
+conditional_else    : CONDLOAD_ELSE whitespace_comment* WHITESPACE conditional_content ;
 statement           : OPEN command CLOSE ;
 lone_comment        : COMMENT ;
 command             : ( defrule | defconst | load | load_random_list ) ;
@@ -44,6 +49,11 @@ DEFCONST            : 'defconst' ;
 
 LOAD                : 'load' ;
 LOADRANDOM          : 'load-random' ;
+
+CONDLOAD_DEFINED    : '#load-if-defined' ;
+CONDLOAD_UNDEFINED  : '#load-if-not-defined' ;
+CONDLOAD_ELSE       : '#else' ;
+CONDLOAD_END        : '#end-if' ;
 
 STRING              : '"' ~["]* '"' ;
 SHORT               : '-'? [0-9]+ ; // This needs to go at the bottom to make it lowere precedence than FACT_ARG... but that probably breaks defconst... FIXME

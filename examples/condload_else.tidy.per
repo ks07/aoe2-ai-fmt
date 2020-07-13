@@ -1,0 +1,12 @@
+#load-if-defined GIANT-MAP
+    (defrule
+        (player-in-game 1)
+        (player-human 1)
+        =>
+        (chat-to-player 1 "3 Build 2 houses, train villagers, and send the first 6 to sheep [7 pop][sheep: 6]")
+        (disable-self)
+    )
+#else
+    (defconst my-const 1)
+    (defconst other-c 2)
+#end-if

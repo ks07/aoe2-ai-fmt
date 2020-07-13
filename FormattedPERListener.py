@@ -43,6 +43,29 @@ class FormattedPERListener(PERListener):
         assert self.__indentLevel > 0
         self.__indentLevel -= 1
 
+    def enterConditional_block(self, ctx:PERParser.Conditional_blockContext):
+        self.__previousType = TopLevelType.OTHER
+
+    def enterConditional_cond(self, ctx:PERParser.Conditional_condContext):
+        if ctx.CONDLOAD_DEFINED():
+            self.__line(ctx.CONDLOAD_DEFINED().getText())
+        else:
+            self.__line(ctx.CONDLOAD_UNDEFINED().getText())
+        self.__write(' ')
+        self.__write(ctx.SYMBOL().getText())
+
+    def enterConditional_else(self, ctx:PERParser.Conditional_elseContext):
+        self.__line(ctx.CONDLOAD_ELSE().getText())
+
+    def enterConditional_content(self, ctx:PERParser.Conditional_contentContext):
+        self.__enter()
+
+    def exitConditional_content(self, ctx:PERParser.Conditional_contentContext):
+        self.__leave()
+
+    def exitConditional_block(self, ctx:PERParser.Conditional_blockContext):
+        self.__line(ctx.CONDLOAD_END().getText())
+
     def exitPer(self, ctx:PERParser.PerContext):
         # Balanced nesting should be enforced on the input by the ANTLR grammar
         # If the nesting is unbalanced once we're done with the parse tree, then that's a formatter bug
