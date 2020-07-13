@@ -31,4 +31,4 @@ gtest : $(INPUTDIR)/*.input.per
 	done
 
 clean :
-	rm -f *.java *.class PERParser.py PERLexer.py PERListener.py *.interp *.tokens
+	rm -f $(BUILDDIR)/* $(PKGDIR)/PERParser.py $(PKGDIR)/PERLexer.py $(PKGDIR)/PERListener.py
