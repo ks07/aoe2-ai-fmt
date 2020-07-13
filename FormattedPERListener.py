@@ -14,7 +14,6 @@ class FormattedPERListener(PERListener):
         self.__out = outStream
         self.__indentLevel = 0
         self.__indent = indent
-        self.__begun = False
         self.__commentSpooler = CommentSpooler()
         self.__explodedPropositionMode = []
         self.__previousType = None
@@ -22,13 +21,12 @@ class FormattedPERListener(PERListener):
     def __write_inline_comments(self):
         if self.__commentSpooler.hasComments():
             self.__write(self.__commentSpooler.getInlineComments())
-            return True
 
     def __line(self, s=''):
-        if self.__write_inline_comments():
-            self.__begun = True
+        self.__write_inline_comments()
 
-        if self.__begun:
+        # Only actually output a line if we've already output something, to prevent leading blank lines
+        if self.__previousType:
             self.__write('\n')
         pfix = self.__indent * self.__indentLevel
         self.__write(pfix)
