@@ -47,4 +47,4 @@ LOADRANDOM          : 'load-random' ;
 
 STRING              : '"' ~["]* '"' ;
 SHORT               : '-'? [0-9]+ ; // This needs to go at the bottom to make it lowere precedence than FACT_ARG... but that probably breaks defconst... FIXME
-SYMBOL              : [a-z0-9\-]+ ; // This is likely too restrictive, but covers all of the values actually defined in the TC guide
+SYMBOL              : [a-zA-Z0-9\-]+ ; // This is likely too restrictive, but covers all of the values actually defined in the TC guide
