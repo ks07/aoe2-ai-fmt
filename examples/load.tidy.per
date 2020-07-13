@@ -1,0 +1,12 @@
+(defrule
+    (game-time less-than 5)
+    =>
+    (train villager)
+)
+
+; import rules from otherfile
+(load "otherfile")
+(load "mainrules")
+
+(defconst feudal-vil-target 22)
+(defconst castle-vil-target 28)

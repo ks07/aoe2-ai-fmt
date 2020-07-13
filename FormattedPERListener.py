@@ -53,7 +53,7 @@ class FormattedPERListener(PERListener):
         # When we leave a statement, the proposition mode stack should be empty
         assert not self.__explodedPropositionMode
         # if this statement was for a defconst command, then don't close on a new line
-        if ctx.command().defconst():
+        if ctx.command().defconst() or ctx.command().load():
             self.__write(ctx.CLOSE().getText())
         else:
             self.__line(ctx.CLOSE().getText())
@@ -69,7 +69,13 @@ class FormattedPERListener(PERListener):
         self.__commentSpooler.spool(ctx.COMMENT())
 
     def enterStatement(self, ctx:PERParser.StatementContext):
-        if self.__previousType and self.__previousType is not TopLevelType.COMMENT and not (self.__previousType is not TopLevelType.DEFCONST or not ctx.command().defconst()):
+        # Insert a blank line based on the transition between top level statement types
+        if (
+            self.__previousType
+            and self.__previousType is not TopLevelType.COMMENT
+            and (self.__previousType is not TopLevelType.DEFCONST or not ctx.command().defconst())
+            and (self.__previousType is not TopLevelType.LOAD or not ctx.command().load())
+        ):
             self.__line()
         self.__line(ctx.OPEN().getText())
 
@@ -144,8 +150,15 @@ class FormattedPERListener(PERListener):
     def exitDefrule(self, ctx:PERParser.DefruleContext):
         self.__leave()
 
+    def enterLoad(self, ctx:PERParser.LoadContext):
+        self.__write(ctx.LOAD().getText())
+        self.__write(' ')
+        self.__write(ctx.STRING().getText())
+        self.__previousType = TopLevelType.LOAD
+
 class TopLevelType(Enum):
     "Top level statement types, to control whitespace generation. An OTHER member is provided for statements that require no special interaction"
     COMMENT  = auto()
     DEFCONST = auto()
+    LOAD     = auto()
     OTHER    = auto()
