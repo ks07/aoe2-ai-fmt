@@ -1,5 +1,7 @@
 import sys
 
+from enum import Enum, auto
+
 from antlr4 import *
 
 from perparse import PERParser, PERListener
@@ -15,13 +17,14 @@ class FormattedPERListener(PERListener):
         self.__begun = False
         self.__commentSpooler = CommentSpooler()
         self.__explodedPropositionMode = []
+        self.__previousType = None
 
     def __write_inline_comments(self):
         if self.__commentSpooler.hasComments():
             self.__write(self.__commentSpooler.getInlineComments())
             return True
 
-    def __line(self, s):
+    def __line(self, s=''):
         if self.__write_inline_comments():
             self.__begun = True
 
@@ -46,7 +49,7 @@ class FormattedPERListener(PERListener):
         # Balanced nesting should be enforced on the input by the ANTLR grammar
         # If the nesting is unbalanced once we're done with the parse tree, then that's a formatter bug
         assert self.__indentLevel == 0
-        self.__line('')
+        self.__line()
 
     def exitStatement(self, ctx:PERParser.StatementContext):
         # When we leave a statement, the proposition mode stack should be empty
@@ -58,13 +61,18 @@ class FormattedPERListener(PERListener):
             self.__line(ctx.CLOSE().getText())
 
     def enterLone_comment(self, ctx:PERParser.Lone_commentContext):
+        if self.__previousType and self.__previousType is not TopLevelType.COMMENT:
+            self.__line()
         self.__line(ctx.COMMENT().getText().strip())
+        self.__previousType = TopLevelType.COMMENT
 
     def enterWhitespace_comment(self, ctx:PERParser.Whitespace_commentContext):
         # Because the formatter will remove newlines, comments must be spooled up to display at line end
         self.__commentSpooler.spool(ctx.COMMENT())
 
     def enterStatement(self, ctx:PERParser.StatementContext):
+        if self.__previousType and self.__previousType is not TopLevelType.COMMENT and not (self.__previousType is not TopLevelType.DEFCONST or not ctx.command().defconst()):
+            self.__line()
         self.__line(ctx.OPEN().getText())
 
     def enterDefconst(self, ctx:PERParser.DefconstContext):
@@ -73,10 +81,12 @@ class FormattedPERListener(PERListener):
         self.__write(ctx.SYMBOL().getText())
         self.__write(' ')
         self.__write(ctx.SHORT().getText())
+        self.__previousType = TopLevelType.DEFCONST
 
     def enterDefrule(self, ctx:PERParser.DefruleContext):
         self.__write(ctx.DEFRULE().getText())
         self.__enter()
+        self.__previousType = TopLevelType.OTHER
 
     def enterProposition(self, ctx:PERParser.PropositionContext):
         self.__line(ctx.OPEN().getText())
@@ -109,7 +119,7 @@ class FormattedPERListener(PERListener):
     def exitProposition(self, ctx:PERParser.PropositionContext):
         if self.__explodedPropositionMode.pop():
             self.__leave()
-            self.__line('')
+            self.__line()
         self.__write(ctx.CLOSE().getText())
 
     def enterAction_list(self, ctx:PERParser.Action_listContext):
@@ -135,3 +145,9 @@ class FormattedPERListener(PERListener):
 
     def exitDefrule(self, ctx:PERParser.DefruleContext):
         self.__leave()
+
+class TopLevelType(Enum):
+    "Top level statement types, to control whitespace generation. An OTHER member is provided for statements that require no special interaction"
+    COMMENT  = auto()
+    DEFCONST = auto()
+    OTHER    = auto()
