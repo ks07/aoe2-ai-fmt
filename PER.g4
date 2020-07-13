@@ -7,7 +7,7 @@ grammar PER;
 per                 : (statement | lone_comment | WHITESPACE)+ EOF ;
 statement           : OPEN command CLOSE ;
 lone_comment        : COMMENT ;
-command             : ( defrule | defconst | load ) ;
+command             : ( defrule | defconst | load | load_random_list ) ;
 defrule             : DEFRULE whitespace_comment+ proposition_list DEFRULE_SEPARATOR whitespace_comment* action_list ;
 proposition_list    : ( proposition whitespace_comment+ )+ ;
 proposition         : OPEN SYMBOL proposition_arg* whitespace_comment? CLOSE ;
@@ -16,7 +16,10 @@ action_list         : ( action whitespace_comment+ )+ ;
 action              : OPEN SYMBOL action_arg* whitespace_comment? CLOSE ;
 action_arg          : ( whitespace_comment (SYMBOL | SHORT | STRING) ) ;
 defconst            : DEFCONST whitespace_comment+ SYMBOL whitespace_comment+ SHORT ;
-load                : LOAD whitespace_comment+ STRING whitespace_comment+ ;
+load                : ( LOAD | LOADRANDOM ) whitespace_comment+ STRING whitespace_comment* ; // Treat load-random with only default as a load
+load_random_list    : LOADRANDOM whitespace_comment+ random_file_list (whitespace_comment+ STRING)? whitespace_comment* ;
+random_file_list    : ( random_file whitespace_comment+ )+ ;
+random_file         : ( SHORT whitespace_comment+ STRING ) ;
 whitespace_comment  : ( WHITESPACE+ COMMENT? WHITESPACE* ) ; // Allows comments to appear within this whitespace, COMMENT enforces a newline
 
 /*
@@ -40,6 +43,7 @@ REL_OP_SHORT        : ( '<' | '<=' | '>' | '>=' | '==' | '!=' ) ;
 DEFCONST            : 'defconst' ;
 
 LOAD                : 'load' ;
+LOADRANDOM          : 'load-random' ;
 
 STRING              : '"' ~["]* '"' ;
 SHORT               : '-'? [0-9]+ ; // This needs to go at the bottom to make it lowere precedence than FACT_ARG... but that probably breaks defconst... FIXME

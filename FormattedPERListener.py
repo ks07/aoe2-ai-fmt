@@ -151,10 +151,29 @@ class FormattedPERListener(PERListener):
         self.__leave()
 
     def enterLoad(self, ctx:PERParser.LoadContext):
-        self.__write(ctx.LOAD().getText())
+        if ctx.LOAD():
+            self.__write(ctx.LOAD().getText())
+        else:
+            # TODO: This is valid but not useful - should the formatter normalise to a simple load and/or warn?
+            self.__write(ctx.LOADRANDOM().getText())
         self.__write(' ')
         self.__write(ctx.STRING().getText())
         self.__previousType = TopLevelType.LOAD
+
+    def enterLoad_random_list(self, ctx:PERParser.Load_random_listContext):
+        self.__write(ctx.LOADRANDOM().getText())
+        self.__enter()
+        self.__previousType = TopLevelType.OTHER
+
+    def enterRandom_file(self, ctx:PERParser.Random_fileContext):
+        self.__line(ctx.SHORT().getText())
+        self.__write(' ')
+        self.__write(ctx.STRING().getText())
+
+    def exitLoad_random_list(self, ctx:PERParser.Load_random_listContext):
+        if ctx.STRING():
+            self.__line(ctx.STRING().getText())
+        self.__leave()
 
 class TopLevelType(Enum):
     "Top level statement types, to control whitespace generation. An OTHER member is provided for statements that require no special interaction"
