@@ -4,7 +4,7 @@ grammar PER;
  * Parser
  */
 
-per                 : (statement | lone_comment | WHITESPACE | whitespace_comment)+ EOF ;
+per                 : (statement | lone_comment | WHITESPACE)+ EOF ;
 statement           : OPEN command CLOSE ;
 lone_comment        : COMMENT ;
 command             : ( defrule | defconst ) ;
