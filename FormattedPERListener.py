@@ -50,16 +50,14 @@ class FormattedPERListener(PERListener):
     def __setPreviousType(self, prev):
         self.__previousType[-1] = prev
 
-    def enterConditional_block(self, ctx:PERParser.Conditional_blockContext):
-        self.__setPreviousType(TopLevelType.OTHER)
-
     def enterConditional_cond(self, ctx:PERParser.Conditional_condContext):
         if ctx.CONDLOAD_DEFINED():
-            self.__write(ctx.CONDLOAD_DEFINED().getText())
+            self.__line(ctx.CONDLOAD_DEFINED().getText())
         else:
-            self.__write(ctx.CONDLOAD_UNDEFINED().getText())
+            self.__line(ctx.CONDLOAD_UNDEFINED().getText())
         self.__write(' ')
         self.__write(ctx.SYMBOL().getText())
+        self.__setPreviousType(TopLevelType.OTHER)
 
     def enterConditional_else(self, ctx:PERParser.Conditional_elseContext):
         self.__line(ctx.CONDLOAD_ELSE().getText())
