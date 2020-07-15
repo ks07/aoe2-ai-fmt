@@ -16,7 +16,7 @@ class FormattedPERListener(PERListener):
         self.__indent = indent
         self.__commentSpooler = CommentSpooler()
         self.__explodedPropositionMode = []
-        self.__previousType = None
+        self.__previousType = [None]
 
     def __write_inline_comments(self):
         if self.__commentSpooler.hasComments():
@@ -26,7 +26,7 @@ class FormattedPERListener(PERListener):
         self.__write_inline_comments()
 
         # Only actually output a line if we've already output something, to prevent leading blank lines
-        if self.__previousType:
+        if self.__getPreviousType():
             self.__write('\n')
         pfix = self.__indent * self.__indentLevel
         self.__write(pfix)
@@ -36,21 +36,32 @@ class FormattedPERListener(PERListener):
         self.__begun = True
         self.__out.write(s)
 
-    def __enter(self):
+    def __enter(self, asTopLevel=False):
         self.__indentLevel += 1
+        if asTopLevel:
+            self.__previousType.append(TopLevelType.NESTED)
 
-    def __leave(self):
+    def __leave(self, asTopLevel=False):
         assert self.__indentLevel > 0
         self.__indentLevel -= 1
+        if asTopLevel:
+            assert len(self.__previousType) > 1
+            self.__previousType.pop()
+
+    def __getPreviousType(self):
+        return self.__previousType[-1]
+
+    def __setPreviousType(self, prev):
+        self.__previousType[-1] = prev
 
     def enterConditional_block(self, ctx:PERParser.Conditional_blockContext):
-        self.__previousType = TopLevelType.OTHER
+        self.__setPreviousType(TopLevelType.OTHER)
 
     def enterConditional_cond(self, ctx:PERParser.Conditional_condContext):
         if ctx.CONDLOAD_DEFINED():
-            self.__line(ctx.CONDLOAD_DEFINED().getText())
+            self.__write(ctx.CONDLOAD_DEFINED().getText())
         else:
-            self.__line(ctx.CONDLOAD_UNDEFINED().getText())
+            self.__write(ctx.CONDLOAD_UNDEFINED().getText())
         self.__write(' ')
         self.__write(ctx.SYMBOL().getText())
 
@@ -58,10 +69,10 @@ class FormattedPERListener(PERListener):
         self.__line(ctx.CONDLOAD_ELSE().getText())
 
     def enterConditional_content(self, ctx:PERParser.Conditional_contentContext):
-        self.__enter()
+        self.__enter(True)
 
     def exitConditional_content(self, ctx:PERParser.Conditional_contentContext):
-        self.__leave()
+        self.__leave(True)
 
     def exitConditional_block(self, ctx:PERParser.Conditional_blockContext):
         self.__line(ctx.CONDLOAD_END().getText())
@@ -82,24 +93,25 @@ class FormattedPERListener(PERListener):
             self.__line(ctx.CLOSE().getText())
 
     def enterLone_comment(self, ctx:PERParser.Lone_commentContext):
-        if self.__previousType and self.__previousType is not TopLevelType.COMMENT:
-            self.__line()
         self.__line(ctx.COMMENT().getText().strip())
-        self.__previousType = TopLevelType.COMMENT
+        self.__setPreviousType(TopLevelType.COMMENT)
 
     def enterWhitespace_comment(self, ctx:PERParser.Whitespace_commentContext):
         # Because the formatter will remove newlines, comments must be spooled up to display at line end
         self.__commentSpooler.spool(ctx.COMMENT())
 
-    def enterStatement(self, ctx:PERParser.StatementContext):
+    def enterToplevel_content(self, ctx:PERParser.Toplevel_contentContext):
         # Insert a blank line based on the transition between top level statement types
         if (
-            self.__previousType
-            and self.__previousType is not TopLevelType.COMMENT
-            and (self.__previousType is not TopLevelType.DEFCONST or not ctx.command().defconst())
-            and (self.__previousType is not TopLevelType.LOAD or not ctx.command().load())
+            self.__getPreviousType()
+            and self.__getPreviousType() is not TopLevelType.COMMENT
+            and self.__getPreviousType() is not TopLevelType.NESTED
+            and (self.__getPreviousType() is not TopLevelType.DEFCONST or not (ctx.statement() and ctx.statement().command().defconst()))
+            and (self.__getPreviousType() is not TopLevelType.LOAD or not (ctx.statement() and ctx.statement().command().load()))
         ):
             self.__line()
+
+    def enterStatement(self, ctx:PERParser.StatementContext):
         self.__line(ctx.OPEN().getText())
 
     def enterDefconst(self, ctx:PERParser.DefconstContext):
@@ -108,12 +120,12 @@ class FormattedPERListener(PERListener):
         self.__write(ctx.SYMBOL().getText())
         self.__write(' ')
         self.__write(ctx.SHORT().getText())
-        self.__previousType = TopLevelType.DEFCONST
+        self.__setPreviousType(TopLevelType.DEFCONST)
 
     def enterDefrule(self, ctx:PERParser.DefruleContext):
         self.__write(ctx.DEFRULE().getText())
         self.__enter()
-        self.__previousType = TopLevelType.OTHER
+        self.__setPreviousType(TopLevelType.OTHER)
 
     def enterProposition(self, ctx:PERParser.PropositionContext):
         self.__line(ctx.OPEN().getText())
@@ -181,12 +193,12 @@ class FormattedPERListener(PERListener):
             self.__write(ctx.LOADRANDOM().getText())
         self.__write(' ')
         self.__write(ctx.STRING().getText())
-        self.__previousType = TopLevelType.LOAD
+        self.__setPreviousType(TopLevelType.LOAD)
 
     def enterLoad_random_list(self, ctx:PERParser.Load_random_listContext):
         self.__write(ctx.LOADRANDOM().getText())
         self.__enter()
-        self.__previousType = TopLevelType.OTHER
+        self.__setPreviousType(TopLevelType.OTHER)
 
     def enterRandom_file(self, ctx:PERParser.Random_fileContext):
         self.__line(ctx.SHORT().getText())
@@ -204,3 +216,4 @@ class TopLevelType(Enum):
     DEFCONST = auto()
     LOAD     = auto()
     OTHER    = auto()
+    NESTED   = auto()

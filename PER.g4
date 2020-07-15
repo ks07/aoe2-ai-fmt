@@ -4,11 +4,11 @@ grammar PER;
  * Parser
  */
 
-per                 : toplevel_content EOF ;
-toplevel_content    : (statement | lone_comment | WHITESPACE | conditional_block)+ ;
+per                 : ( toplevel_content | WHITESPACE )+ EOF ;
+toplevel_content    : ( statement | lone_comment | conditional_block ) ;
 conditional_block   : conditional_cond conditional_content WHITESPACE+ conditional_else? CONDLOAD_END ;
 conditional_cond    : ( CONDLOAD_DEFINED | CONDLOAD_UNDEFINED ) whitespace_comment+ SYMBOL whitespace_comment* WHITESPACE ;
-conditional_content : toplevel_content ;
+conditional_content : ( toplevel_content | WHITESPACE )+ ;
 conditional_else    : CONDLOAD_ELSE whitespace_comment* WHITESPACE conditional_content ;
 statement           : OPEN command CLOSE ;
 lone_comment        : COMMENT ;
