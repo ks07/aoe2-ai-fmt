@@ -1,8 +1,4 @@
-import sys
-
 from enum import Enum, auto
-
-from antlr4 import *
 
 from perparse import PERParser, PERListener
 from CommentSpooler import CommentSpooler
