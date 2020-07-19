@@ -1,18 +1,20 @@
-.PHONY: gtest test clean
+.PHONY: gtest test clean lint
 
 SHELL := /bin/bash
 
 INPUTDIR = examples
 BUILDDIR = build
-PKGDIR   = perparse
+PKGDIR   = performat/perparse
 
-$(PKGDIR)/PERParser.py $(PKGDIR)/PERLexer.py $(PKGDIR)/PERListener.py : PER.g4
+PARSER_FILES = $(PKGDIR)/PERParser.py $(PKGDIR)/PERLexer.py $(PKGDIR)/PERListener.py
+
+$(PARSER_FILES) : PER.g4
 	antlr4 -Dlanguage=Python3 -o $(BUILDDIR) PER.g4
 	mv $(BUILDDIR)/*.py $(PKGDIR)/
 
-test : ${INPUTDIR}/*.input.per
+test : $(PARSER_FILES)
 	TMP=$$(mktemp); \
-	for f in $^; do \
+	for f in ${INPUTDIR}/*.input.per; do \
 		echo; echo "------------"; echo $${f}; echo "------------"; echo; \
 		./format.py "$${f}" "$${TMP}"; \
 		diff -q "$${TMP}" "$${f%.input.per}.tidy.per" || diff -y "$${TMP}" "$${f%.input.per}.tidy.per"; \
@@ -30,5 +32,8 @@ gtest : $(INPUTDIR)/*.input.per
 		grun PER per ../$${f} -tree; \
 	done
 
+lint : $(PARSER_FILES)
+	pylint performat
+
 clean :
-	rm -f $(BUILDDIR)/* $(PKGDIR)/PERParser.py $(PKGDIR)/PERLexer.py $(PKGDIR)/PERListener.py
+	rm -f $(BUILDDIR)/* $(PARSER_FILES)

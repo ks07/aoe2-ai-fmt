@@ -18,10 +18,7 @@ an error.
 import argparse
 import sys
 
-from antlr4 import FileStream, CommonTokenStream, ParseTreeWalker
-
-from perparse import PERLexer, PERParser
-from formatted_per_listener import FormattedPERListener
+from performat import format_per
 
 def main():
     """Main script function, providing a simple CLI for the formatter."""
@@ -35,18 +32,6 @@ def main():
     else:
         with open(args.out, "w", encoding="utf8", newline="\r\n") as output:
             format_per(args.inpath, output)
-
-def format_per(in_path, out_stream):
-    """Parses and formats a .per file, writing formatted output to the supplied text stream."""
-    inp = FileStream(in_path)
-    lexer = PERLexer(inp)
-    stream = CommonTokenStream(lexer)
-    parser = PERParser(stream)
-    tree = parser.per()
-
-    formatter = FormattedPERListener(out_stream)
-    walker = ParseTreeWalker()
-    walker.walk(formatter, tree)
 
 if __name__ == "__main__":
     main()

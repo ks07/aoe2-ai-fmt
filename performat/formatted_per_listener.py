@@ -2,17 +2,18 @@
 
 from enum import Enum, auto
 
-from perparse import PERParser, PERListener
-from comment_spooler import CommentSpooler
+from .perparse import PERParser, PERListener
+from .comment_spooler import CommentSpooler
 
 class FormattedPERListener(PERListener):
     """An ANTLR4 listener for AoE2 .per AI files that writes formatted rules to an output stream."""
 
     # pylint: disable=too-many-public-methods
 
-    def __init__(self, outStream, indent='    '):
+    def __init__(self, out_stream, indent='    '):
         """Instantiates a listener with a given output stream, and an option configurable indent."""
-        self.__out = outStream
+        super().__init__()
+        self.__out = out_stream
         self.__indent_level = 0
         self.__indent = indent
         self.__comment_spooler = CommentSpooler()
