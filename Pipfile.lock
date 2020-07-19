@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "7a9836eee738ca678ada9609760d4d5664f705605921bc1c1ffe85e77ebb8d0d"
+            "sha256": "04e8ddaefd2425960ebd074854b2f26e550cb77784945139fb3121c2e801677a"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -20,8 +20,11 @@
             "hashes": [
                 "sha256:15793f5d0512a372b4e7d2284058ad32ce7dd27126b105fb0b2245130445db33"
             ],
-            "index": "pypi",
             "version": "==4.8"
+        },
+        "aoe2-ai-fmt": {
+            "editable": true,
+            "path": "."
         }
     },
     "develop": {

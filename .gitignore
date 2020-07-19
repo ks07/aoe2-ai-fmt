@@ -9,3 +9,6 @@ PERListener.py
 
 # Temp build directory
 build/
+
+# setuptools output
+*.egg-info/

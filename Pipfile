@@ -5,9 +5,10 @@ verify_ssl = true
 
 [dev-packages]
 pylint = "*"
+setuptools = "*"
 
 [packages]
-antlr4-python3-runtime = "*"
+aoe2-ai-fmt = {editable = true, path = "."}
 
 [requires]
 python_version = "3.6"
