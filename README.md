@@ -43,6 +43,12 @@ A basic test recipe is included in the Makefile to easily run the tool against a
 make test
 ```
 
+A make rule exists to run pylint, with the included .pylintrc ignoring the auto-generated ANTLR4 parser files.
+
+```
+make lint
+```
+
 ## Limitations
 
 As the tool is built using a parser, invalid syntax will cause the formatter to error.
