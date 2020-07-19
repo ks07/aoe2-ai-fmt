@@ -12,3 +12,7 @@ build/
 
 # setuptools output
 *.egg-info/
+
+# Bytecode
+__pycache__/
+*.py[cod]
