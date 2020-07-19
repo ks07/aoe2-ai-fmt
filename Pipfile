@@ -9,6 +9,3 @@ setuptools = "*"
 
 [packages]
 aoe2-ai-fmt = {editable = true, path = "."}
-
-[requires]
-python_version = "3.6"

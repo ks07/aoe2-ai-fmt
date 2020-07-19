@@ -4,7 +4,10 @@ This project provides a script that allows basic syntax checking and formatting 
 
 Note that this tool is currently a work-in-progress. Crucially, it does not yet have full compatibility with .per files built for DE or User Patch versions of the game.
 
-This tool depends on Python 3.6. It has been developed and tested using Ubuntu for Windows, but should work fine in any Linux based environment.
+This tool depends on Python >= 3.6.
+
+It has been developed using Python 3.6 on Ubuntu for Windows (WSL), but has also been tested against Python 3.8 on Ubuntu 20.04, and Python 3.8 on Windows 10.
+In any case, the tool should work fine in any environment which provides the required Python version. Development requires a Linux environment.
 
 ## Dependencies
 
@@ -12,11 +15,13 @@ Building the tool requires [ANTLR v4.8](https://www.antlr.org/), [pipenv](https:
 
 ## Installation From Source
 
-Clone the repository, and then use pipenv to create a python virtualenv and install the necessary dependencies within it.
+Clone the repository, and then use pipenv to create a python virtualenv and install the necessary dependencies within it. Specify the `--dev` argument if you're going to be making changes.
 
 ```
-pipenv install
+pipenv --python 3 install [--dev]
 ```
+
+(Note that python 3.6 is required, but this is not enforced by the Pipfile thanks to [a limitation in pipenv](https://github.com/pypa/pipenv/issues/1050).)
 
 It is then necessary to build the lexer, parser, and supporting files using antlr4. The provided Makefile can invoke this for you, provided `antlr4` is in your `$PATH`.
 
