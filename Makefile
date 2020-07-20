@@ -1,10 +1,11 @@
-.PHONY: gtest test clean lint
+.PHONY: gtest test clean lint dist
 
 SHELL := /bin/bash
 
 INPUTDIR = examples
 BUILDDIR = build
 PKGDIR   = performat/perparse
+DISTDIR  = dist
 
 PARSER_FILES = $(PKGDIR)/PERParser.py $(PKGDIR)/PERLexer.py $(PKGDIR)/PERListener.py
 
@@ -35,5 +36,8 @@ gtest : $(INPUTDIR)/*.input.per
 lint : $(PARSER_FILES)
 	pylint performat
 
+dist :
+	python setup.py sdist bdist_wheel
+
 clean :
-	rm -f $(BUILDDIR)/* $(PARSER_FILES)
+	rm -f $(BUILDDIR)/* $(PARSER_FILES) $(DISTDIR)/
