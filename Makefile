@@ -40,4 +40,4 @@ dist :
 	python setup.py sdist bdist_wheel
 
 clean :
-	rm -f $(BUILDDIR)/* $(PARSER_FILES) $(DISTDIR)/
+	rm -rf $(BUILDDIR)/* $(PARSER_FILES) $(DISTDIR)/
