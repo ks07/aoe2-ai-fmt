@@ -9,6 +9,36 @@ This tool depends on Python >= 3.6.
 It has been developed using Python 3.6 on Ubuntu for Windows (WSL), but has also been tested against Python 3.8 on Ubuntu 20.04, and Python 3.8 on Windows 10.
 In any case, the tool should work fine in any environment which provides the required Python version. Development requires a Linux environment.
 
+# Library Usage
+
+The tool can be used from the command line, or can be used as a library in your python projects.
+To use as a library, you can install via pip.
+
+```
+pip install aoe2-ai-fmt
+```
+
+Then use the `format_per` function as follows.
+
+```
+from performat import format_per
+
+# Define a string containing some messy per content
+my_per_content='''
+  (defrule (players-unit-type-count 1 scout-cavalry < 6)
+    =>
+  (goal 1 100) (disable-self) )
+'''
+
+# Write formatted per content to formatted_output.per
+with open('formatted_output.per', 'w', encoding='utf8', newline='\r\n') as out:
+    format_per(in_string=my_per_content, out_stream=out)
+```
+
+See format.py for an alternative usage example.
+
+# Usage From Source
+
 ## Dependencies
 
 Building the tool requires [ANTLR v4.8](https://www.antlr.org/), [pipenv](https://pypi.org/project/pipenv/), and GNU Make.
