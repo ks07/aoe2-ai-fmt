@@ -5,7 +5,7 @@ with open("README.md", "r") as readme:
 
 setup(
     name="aoe2-ai-fmt",
-    version="0.1",
+    version="0.2",
     description="A formatter for AoE2 AI rule files (.per).",
     long_description=long_description,
     long_description_content_type="text/markdown",
