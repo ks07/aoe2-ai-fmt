@@ -1,12 +1,10 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "04e8ddaefd2425960ebd074854b2f26e550cb77784945139fb3121c2e801677a"
+            "sha256": "255679123b8495acb6314f65bd05a8b47129e1da1abc66b9c066ed4bff41c924"
         },
         "pipfile-spec": 6,
-        "requires": {
-            "python_version": "3.6"
-        },
+        "requires": {},
         "sources": [
             {
                 "name": "pypi",
@@ -127,6 +125,14 @@
             ],
             "markers": "python_version < '3.8' and implementation_name == 'cpython'",
             "version": "==1.4.1"
+        },
+        "wheel": {
+            "hashes": [
+                "sha256:8788e9155fe14f54164c1b9eb0a319d98ef02c160725587ad60f14ddc57b6f96",
+                "sha256:df277cb51e61359aba502208d680f90c0493adec6f0e848af94948778aed386e"
+            ],
+            "index": "pypi",
+            "version": "==0.34.2"
         },
         "wrapt": {
             "hashes": [
