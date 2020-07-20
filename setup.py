@@ -11,6 +11,7 @@ setup(
     long_description_content_type="text/markdown",
     author="George Field",
     author_email="george@cucurbit.dev",
+    license="MIT",
     url="https://github.com/ks07/aoe2-ai-fmt",
     packages=find_packages(),
     scripts=["format.py"],
